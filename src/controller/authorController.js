@@ -1,4 +1,5 @@
 const authorModel = require("../models/authorModel");
+const jwt = require("jsonwebtoken");
 
 const createAuthor = async function (req, res) {
   try {
@@ -13,11 +14,8 @@ const createAuthor = async function (req, res) {
 
     if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.fname)) return res.status(400).send({msg:"Pls Enter Valid First Name"})
 
-     
     if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.lname)) return res.status(400).send({msg:"Pls Enter Valid Last Name"})
     
-    // if(!/^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[#$^+=!*()@%&]).{8,10}$/.test(data.password)) return res.status(400).send({msg:"Password must contains 1 upperCaseletter 1 smallCaseLetter 1 special character and 1 digit"})
-
     let savedData = await authorModel.create(data);
     res.status(201).send({ status: "True", data: savedData });
   } catch (error) {
@@ -26,4 +24,29 @@ const createAuthor = async function (req, res) {
   }
 };
 
-module.exports.createAuthor = createAuthor;
+const authorLogin=async function (req, res){
+  try{
+    let userName=req.body.email;
+    let password=req.body.password;
+
+    let author=await authorModel.findOne({email:userName, password:password});
+    if(!author)
+    return res.status(400).send({status:false, msg:"email or password doesn't match"});
+
+    let token = jwt.sign(
+      {
+        authorId: author._id.toString(),
+        group:"R-15 Room-11",
+        batch:"Radon"
+      },
+      "Hera-pheri"
+    );
+    res.setHeader("x-api-key", token);
+    res.send({ status: true, token: token });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).send({ err : error.message });
+  }
+};
+
+module.exports = {createAuthor, authorLogin};

@@ -47,34 +47,41 @@ const getBlogs = async function(req, res){
 
 const updateBlogs = async function(req, res){
     try{
-    
-    let blogId = req.params.blogId;
-    let data = req.body;
-    if (Object.keys(data).length == 0)
-      return res.status(400).send({ status: false, msg: "Body is Required"});
-    let blogData = await blogsModel.findOne({ _id: blogId, isDeleted: false });
-    if (!blogData) return res.status(404).send({ status: false, msg: "blogsId related data unavailable"});
-    if (data.title) blogData.title = data.title;
-    if (data.category) blogData.category = data.category;
-    if (data.body) blogData.body = data.body;
-    if (data.tag) {
-      if (typeof data.tag == "object") {
-        blogData.tag.push(...data.tag);
-      } else {
-        blogData.tag.push(data.tag);
-      }
-    }
-    if (data.subCategory) {
-      if (typeof data.subCategory == "object") {
-        blogData.subCategory.push(...data.subCategory);
-      } else {
-        blogData.subCategory.push(data.subCategory);
-      }
-    }
-    blogData.publishedAt = Date()
-    blogData.isPublished = true;
-    blogData.save();
-    res.status(200).send({ status: true, data: blogData});
+        let blogId = req.params.blogId;
+        let data = req.body;
+        
+        if (Object.keys(data).length == 0)
+        return res.status(400).send({ status: false, msg: "Body is Required"});
+        
+        let blogData = await blogsModel.findOne({ _id: blogId, isDeleted: false });
+        if (!blogData) return res.status(404).send({ status: false, msg: "blogsId related data unavailable"});
+
+        //authorization
+        if(req.headers["authorId"] !== blogData.authorId.toString()) return res.status(403).send({ status: false, msg: "You are not authorized...." })
+
+        if (data.title) blogData.title = data.title;
+        if (data.category) blogData.category = data.category;
+        if (data.body) blogData.body = data.body;
+        if (data.tag) {
+        
+            if (typeof data.tag == "object") {
+            blogData.tag.push(...data.tag);
+        } else {
+            blogData.tag.push(data.tag);
+        }
+        }
+        
+        if (data.subCategory) {
+            if (typeof data.subCategory == "object") {
+                blogData.subCategory.push(...data.subCategory);
+            } else {
+                blogData.subCategory.push(data.subCategory);
+            }
+        }
+        blogData.publishedAt = Date()
+        blogData.isPublished = true;
+        blogData.save();
+        res.status(200).send({ status: true, data: blogData});
     } catch (error){
         console.log(error.message)
         res.status(500).send({ err: error.message})
@@ -86,8 +93,11 @@ const deleteByBlogId = async function(req, res){
         let idOfBlog = req.params.blogId
         if(!idOfBlog) return res.status(400).send({status: false, msg: "Blog Id is Mandatory"})
 
-        let blogCheck = await blogsModel.findById(idOfBlog)
-        if(!blogCheck) return res.status(404).send({status: false, msg: "Blog not found, please provide valid blogId"})
+        let blogData = await blogsModel.findById(idOfBlog)
+        if(!blogData) return res.status(404).send({status: false, msg: "Blog not found, please provide valid blogId"})
+        
+        //authorization
+        if(req.headers["authorId"] !== blogData.authorId.toString()) return res.status(403).send({ status: false, msg: "You are not authorized...." })
 
         deletedTime= new Date().toISOString();
 
@@ -103,10 +113,14 @@ const deleteByBlogId = async function(req, res){
 const deleteByQueryParams = async function(req, res){
     try{
         let queryData= req.query
-        let blog = await blogsModel.find({ isDeleted: false } && queryData)
-        if (blog.length == 0) {
+        let blogData = await blogsModel.find({ isDeleted: false && queryData} )
+        if (blogData.length == 0) {
             return res.status(404).send({ msg: "no such blog" })
         }
+
+        //authorization0
+        if(req.headers["authorId"] !== blogData.authorId) return res.status(403).send({ status: false, msg: "You are not authorized...." })
+
         deletedTime= new Date().toISOString();
         await blogsModel.updateMany(queryData, { $set: { "isDeleted": true , "deletedAt": deletedTime} })
         res.sendStatus(200)
