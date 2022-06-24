@@ -131,21 +131,21 @@ const deleteByQueryParams = async function(req, res){
             data.tags = { $in: data.tags.split(',') }
             console.log(data.tags)
         }
-        if (data.subcategory) {
-            data.subcategory = { $in: data.subcategory.split(',') }
+        if (data.subCategory) {
+            data.subCategory = { $in: data.subCategory.split(',') }
         }
         query['$or'] = [
             { isPublished: data.isPublished },
             { authorId: data.authorId },
             { category: data.category },
-            { subcategory: data.subcategory },
+            { subCategory: data.subCategory },
             { tags: data.tags }
         ]
         let del = await blogsModel.find(query)
         if (del.length == 0) {
             return res.status(404).send({ status: false, msg: "No such blog present"})
         }
-        const result = await blogsModel.updateMany(
+        await blogsModel.updateMany(
             query, { $set: { isDeleted: true, DeletedAt: new Date().toLocaleString() } })
         res.status(200).send({ status: true, msg: "blogs deleted" })
 
