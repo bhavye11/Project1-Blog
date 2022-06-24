@@ -119,7 +119,7 @@ const deleteByBlogId = async function(req, res){
 const deleteByQueryParams = async function(req, res){
     try{
         let data = req.query
-        if (Object.keys(data).length <= 0) return res.status(404).send({ status: false, msg: "please enter filter for deletion" })
+        if (Object.keys(data).length <= 0) return res.status(400).send({ status: false, msg: "please enter filter for deletion" })
         let query = {
             isDeleted: false,
             authorId: req.headers["authorId"]
