@@ -26,23 +26,23 @@ const createAuthor = async function (req, res) {
 
 const authorLogin=async function (req, res){
   try{
-    let userName=req.body.email;
+    let email=req.body.email;
+    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
+
     let password=req.body.password;
 
-    let author=await authorModel.findOne({email:userName, password:password});
+    let author=await authorModel.findOne({email:email, password:password});
     if(!author)
     return res.status(400).send({status:false, msg:"email or password doesn't match"});
 
     let token = jwt.sign(
       {
         authorId: author._id.toString(),
-        group:"R-15 Room-11",
-        batch:"Radon"
       },
       "Hera-pheri"
     );
     res.setHeader("x-api-key", token);
-    res.send({ status: true, token: token });
+    res.status(200).send({ status: true, token: token });
   } catch (error) {
     console.log(error.message);
     res.status(500).send({ err : error.message });

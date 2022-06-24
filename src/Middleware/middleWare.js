@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const blogsModel = require("../models/blogsModel");
 
 const authentication = function(req, res, next){
     
