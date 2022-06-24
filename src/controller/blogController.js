@@ -1,13 +1,18 @@
 const { findOneAndUpdate } = require("../models/blogsModel")
 const blogsModel = require("../models/blogsModel")
 const authorModel = require("../models/authorModel")
+
 const createBlog=async function(req, res){
     try{
         let reqData=req.body
+        if (Object.keys(reqData).length == 0) return res.status(400).send({ status: false, msg: "Body is Required"});
+        
         let authorId = reqData.authorId
+        if (!authorId) res.status(400).send({msg:"Please enter Author Id"})
+        
         let savedData = await authorModel.findById(authorId)
-        if (!savedData) res.status(400).send("author id doesnot exist in author collection")
-        if (!reqData) res.status(400).send({msg:"Please enter your data"})
+        if (!savedData) res.status(400).send("Author id does not exist in author collection")
+        
         let checkIsPublished = req.body.isPublished
         if(checkIsPublished==='true'){
             published= new Date().toISOString();
@@ -48,8 +53,9 @@ const getBlogs = async function(req, res){
 const updateBlogs = async function(req, res){
     try{
         let blogId = req.params.blogId;
-        let data = req.body;
+        if(!blogId) return res.status(400).send({status: false, msg: "Blog Id is Mandatory"})
         
+        let data = req.body;
         if (Object.keys(data).length == 0)
         return res.status(400).send({ status: false, msg: "Body is Required"});
         
