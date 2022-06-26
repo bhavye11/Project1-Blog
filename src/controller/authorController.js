@@ -30,6 +30,7 @@ const authorLogin=async function (req, res){
     if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
 
     let password=req.body.password;
+    if(!password) return res.status(400).send({status: false, msg: "Password Shouldn't be empty"})
 
     let author=await authorModel.findOne({email:email, password:password});
     if(!author)
