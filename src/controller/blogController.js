@@ -76,11 +76,11 @@ const updateBlogs = async function(req, res){
             }
         }
         
-        if (data.subCategory) {
-            if (typeof data.subCategory == "object") {
-                blogData.subCategory.push(...data.subCategory);
+        if (data.category) {
+            if (typeof data.subcategory == "object") {
+                blogData.subcategory.push(...data.subcategory);
             } else {
-                blogData.subCategory.push(data.subCategory);
+                blogData.subcategory.push(data.subcategory);
             }
         }
         blogData.publishedAt = Date()
@@ -130,14 +130,14 @@ const deleteByQueryParams = async function(req, res){
             data.tags = { $in: data.tags.split(',') }
             console.log(data.tags)
         }
-        if (data.subCategory) {
-            data.subCategory = { $in: data.subCategory.split(',') }
+        if (data.subcategory) {
+            data.subcategory = { $in: data.subcategory.split(',') }
         }
         query['$or'] = [
             { isPublished: data.isPublished },
             { authorId: data.authorId },
             { category: data.category },
-            { subCategory: data.subCategory },
+            { subcategory: data.subcategory },
             { tags: data.tags }
         ]
         let del = await blogsModel.find(query)
