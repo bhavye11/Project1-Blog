@@ -17,7 +17,7 @@ const createAuthor = async function (req, res) {
     if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.lname)) return res.status(400).send({msg:"Pls Enter Valid Last Name"})
     
     let savedData = await authorModel.create(data);
-    res.status(201).send({ status: "True", data: savedData });
+    res.status(201).send({ status: true, data: savedData });
   } catch (error) {
     console.log(error.message);
     res.status(500).send({ err : error.message });
