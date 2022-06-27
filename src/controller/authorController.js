@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const createAuthor = async function (req, res) {
   try {
     let data = req.body;
-    if (Object.keys(data).length == 0) return res.status(400).send({ msg: "Body should not be empty" })
+    if (Object.keys(data).length == 0) return res.status(400).send({status:false, msg: "Body should not be empty" })
     
-    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(data.email)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
+    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(data.email)) return res.status(400).send({ status:false, message: "Pls Enter Email in valid Format" })
 
     if(!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data) ) return res.status(400).send({status:false, msg:"fname, lname, title, email, password are required"})
 
