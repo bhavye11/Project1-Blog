@@ -1,4 +1,3 @@
-const { findOneAndUpdate } = require("../models/blogsModel")
 const blogsModel = require("../models/blogsModel")
 const authorModel = require("../models/authorModel")
 
@@ -8,10 +7,10 @@ const createBlog=async function(req, res){
         if (Object.keys(reqData).length == 0) return res.status(400).send({ status: false, msg: "Body is Required"});
         
         let authorId = reqData.authorId
-        if (!authorId) res.status(400).send({msg:"Please enter Author Id"})
+        if (!authorId) res.status(400).send({ status: false, msg: "Please enter Author Id"})
         
         let savedData = await authorModel.findById(authorId)
-        if (!savedData) res.status(400).send("Author id does not exist in author collection")
+        if (!savedData) res.status(400).send({ status: false, msg: "Author id does not exist in author collection"})
         
         let checkIsPublished = req.body.isPublished
         if(checkIsPublished==='true'){
@@ -19,7 +18,7 @@ const createBlog=async function(req, res){
             reqData.publishedAt= published
         }
         let Blog=await blogsModel.create(reqData)
-        res.status(201).send({"data":Blog}) 
+        res.status(201).send({status:true,"data":Blog}) 
     }
     catch(err) {
         console.log("ERROR: ", err.message)

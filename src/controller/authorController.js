@@ -8,13 +8,13 @@ const createAuthor = async function (req, res) {
     
     if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(data.email)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
 
-    if(!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data) ) return res.status(400).send({msg:"fname, lname, title, email, password are required"})
+    if(!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data) ) return res.status(400).send({status:false, msg:"fname, lname, title, email, password are required"})
 
-    if (data.password.trim() == "" || data.email.trim() == "" || data.lname.trim() == "" || data.fname.trim() == "" || data.title.trim() == "") return res.status(400).send({msg:"The Required Attributes should not be empty"})
+    if (data.password.trim() == "" || data.email.trim() == "" || data.lname.trim() == "" || data.fname.trim() == "" || data.title.trim() == "") return res.status(400).send({status:false, msg:"The Required Attributes should not be empty"})
 
-    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.fname)) return res.status(400).send({msg:"Pls Enter Valid First Name"})
+    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.fname)) return res.status(400).send({status:false, msg:"Pls Enter Valid First Name"})
 
-    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.lname)) return res.status(400).send({msg:"Pls Enter Valid Last Name"})
+    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.lname)) return res.status(400).send({status:false, msg:"Pls Enter Valid Last Name"})
     
     let savedData = await authorModel.create(data);
     res.status(201).send({ status: true, data: savedData });
@@ -27,7 +27,7 @@ const createAuthor = async function (req, res) {
 const authorLogin=async function (req, res){
   try{
     let email=req.body.email;
-    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ message: "Pls Enter Email in valid Format" })
+    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ status:false, message: "Pls Enter Email in valid Format" })
 
     let password=req.body.password;
     if(!password) return res.status(400).send({status: false, msg: "Password Shouldn't be empty"})
