@@ -1,21 +1,44 @@
 const authorModel = require("../models/authorModel");
 const jwt = require("jsonwebtoken");
 
+const isValid = function(value){
+  if(typeof value === "undefined" || value === null ) return false
+  if(typeof value === "string" || value.trim().length === 0 ) return false
+  return true
+}
+
+const isValidTitle = function(title){
+  return ["Mr", "Ms", "Miss"].indexOf(title) !== -1
+}
+
+const isValidRequestBody = function(requestBody){
+  return Object.keys(requestBody).length > 0
+}
+
 const createAuthor = async function (req, res) {
   try {
     let data = req.body;
-    if (Object.keys(data).length == 0) return res.status(400).send({status:false, msg: "Body should not be empty" })
+    if (!isValidRequestBody(data)) return res.status(400).send({status:false, msg: "Body should not be empty" })
     
-    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(data.email)) return res.status(400).send({ status:false,  message: "Pls Enter Email in valid Format" })
+    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(data.email)) return res.status(400).send({ status:false,  message: "Please Enter Email in valid Format" })
 
     if(!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data) ) return res.status(400).send({status:false, msg:"fname, lname, title, email, password are required"})
 
-    if (data.password.trim() == "" || data.email.trim() == "" || data.lname.trim() == "" || data.fname.trim() == "" || data.title.trim() == "") return res.status(400).send({status:false, msg:"The Required Attributes should not be empty"})
+    if(!isValid(data.fname)) return res.status(400).send({status:false, msg:"Please Enter First Name"})
 
-    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.fname)) return res.status(400).send({status:false, msg:"Pls Enter Valid First Name"})
-
-    if(!/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z])$/.test(data.lname)) return res.status(400).send({status:false, msg:"Pls Enter Valid Last Name"})
+    if(!isValid(data.lname)) return res.status(400).send({status:false, msg:"Please Enter Last Name"})
     
+    if(!isValid(data.title)) return res.status(400).send({status:false, msg:"Please Enter Title"})
+
+    if(!isValid(data.password)) return res.status(400).send({status:false, msg:"Please Enter Password"})
+
+    const isEmailUsed = await authorModel.findOne({email: data.email})
+
+    if(isEmailUsed){
+      res.status(400).send({status: false, msg: `${data.email} this email is already been used.`})
+      return
+    }
+
     let savedData = await authorModel.create(data);
     res.status(201).send({ status: true, data: savedData });
   } catch (error) {
@@ -26,15 +49,26 @@ const createAuthor = async function (req, res) {
 
 const authorLogin=async function (req, res){
   try{
-    let email=req.body.email;
+    let requestBody = req.body
+    if(!isValidRequestBody(requestBody)){
+      res.status(400).send({status: false, msg: "Please Provide Login Details"})
+      return
+    }
+
+    if(isValid(requestBody.eemail)){
+      res.status(400).send({status: false, msg: "Email is required"})
+      return
+    }
     if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ status:false, message: "Pls Enter Email in valid Format" })
 
-    let password=req.body.password;
-    if(!password) return res.status(400).send({status: false, msg: "Password Shouldn't be empty"})
+    if(!isValid(requestBody.password)){
+      res.status(400).send({status: false, msg: "Password is required"})
+      return
+    }
 
-    let author=await authorModel.findOne({email:email, password:password});
+    let author=await authorModel.findOne({email:requestBody.email, password:requestBody.password});
     if(!author)
-    return res.status(400).send({status:false, msg:"email or password doesn't match"});
+    return res.status(401).send({status:false, msg:"email or password doesn't match"})
 
     let token = jwt.sign(
       {

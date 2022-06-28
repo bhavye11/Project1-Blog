@@ -6,7 +6,7 @@ const authentication = function(req, res, next){
         let token = req.headers["x-Api-Key"];
         if (!token) token = req.headers["x-api-key"];
 
-        if (!token) return res.status(400).send({ status: false, msg: "token must be present" });
+        if (!token) return res.status(401).send({ status: false, msg: "token must be present" });
 
         let decodedToken= jwt.verify(token, "Hera-pheri");
         if (!decodedToken) return res.status(401).send({ status: false, msg: "token is invalid" });
