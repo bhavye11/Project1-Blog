@@ -18,8 +18,8 @@ const blogSchema=new mongoose.Schema({
     require:true
   },
   tags:{
-    typeof:[String],
-    trim: true
+    typeof:[{type:String,
+    trim: true}]
   },
   category: [{type:[String],
     trim: true,

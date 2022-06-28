@@ -24,13 +24,13 @@ const createAuthor = async function (req, res) {
 
     if(!("fname" in data) || !("lname" in data) || !("title" in data) || !("email" in data) || !("password" in data) ) return res.status(400).send({status:false, msg:"fname, lname, title, email, password are required"})
 
-    if(!isValid(data.fname)) return res.status(400).send({status:false, msg:"Please Enter First Name"})
+    if(isValid(data.fname)) return res.status(400).send({status:false, msg:"Please Enter First Name"})
 
-    if(!isValid(data.lname)) return res.status(400).send({status:false, msg:"Please Enter Last Name"})
+    if(isValid(data.lname)) return res.status(400).send({status:false, msg:"Please Enter Last Name"})
     
-    if(!isValid(data.title)) return res.status(400).send({status:false, msg:"Please Enter Title"})
+    if(isValid(data.title)) return res.status(400).send({status:false, msg:"Please Enter Title"})
 
-    if(!isValid(data.password)) return res.status(400).send({status:false, msg:"Please Enter Password"})
+    if(isValid(data.password)) return res.status(400).send({status:false, msg:"Please Enter Password"})
 
     const isEmailUsed = await authorModel.findOne({email: data.email})
 
@@ -55,13 +55,13 @@ const authorLogin=async function (req, res){
       return
     }
 
-    if(isValid(requestBody.eemail)){
+    if(isValid(requestBody.email)){
       res.status(400).send({status: false, msg: "Email is required"})
       return
     }
-    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(email)) return res.status(400).send({ status:false, message: "Pls Enter Email in valid Format" })
+    if (!/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(requestBody.email)) return res.status(400).send({ status:false, message: "Please Enter Email in valid Format" })
 
-    if(!isValid(requestBody.password)){
+    if(isValid(requestBody.password)){
       res.status(400).send({status: false, msg: "Password is required"})
       return
     }
