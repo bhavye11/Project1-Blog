@@ -4,6 +4,7 @@ const authorController=require('../controller/authorController')
 const blogController=require('../controller/blogController')
 const middleWare = require("../Middleware/middleWare")
 
+// APIs
 router.post('/authors', authorController.createAuthor)
 
 router.post("/blogs", middleWare.authentication, blogController.createBlog)
